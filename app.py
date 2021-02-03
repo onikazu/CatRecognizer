@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 from flask import Flask, request, abort
@@ -12,8 +14,8 @@ from keras.preprocessing import image
 app = Flask(__name__)
 
 
-ACCESS_TOKEN = "L8iVaHxDFP9HLFH5V5TYyWcSEcGsHJACpj/8UgtNqR4uikUCAvAqIeXBY+bwkEnwE0xHSMbQnGn/N8YvZFRrq4PikcAmuHRgqd+1RFSIzMtHLN63V5GMBf9piWzg6saSiM7q1fKDvEoAWhfc7aB5RAdB04t89/1O/w1cDnyilFU="
-SECRET = "7ad13f0b5780f50f30df343f282d787c"
+ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
+SECRET = os.environ["LINE_SECRET_KEY"]
 
 FQDN = "https://cat-recognizer.herokuapp.com/"
 
@@ -52,9 +54,9 @@ def handle_image_message(event):
         result_predict = model.predict(x)
 
         if result_predict < 0.5:
-            text = "This is cat"
+            text = f"This is cat(cat: {1-result_predict}, dog: {result_predict})"
         if result_predict >= 0.5:
-            text = "This is dog"
+            text = f"This is dog (cat: {1-result_predict}, dog: {result_predict})"
 
         #line_bot_api.reply_message(event.reply_token,ImageSendMessage(original_content_url=FQDN+"/static/"+event.message.id+".jpg",preview_image_url=FQDN+"/static/"+event.message.id+".jpg"))
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=text))
